@@ -134,10 +134,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.fetch:
-        # 1. Get fresh data
         fresh_data = fetch_from_github()
         
-        # 2. Merge with history and save (This is your long-term storage)
         stats = {
             "views": update_history(fresh_data["views"], "hist_views.csv"),
             "clones": update_history(fresh_data["clones"], "hist_clones.csv"),
@@ -146,7 +144,6 @@ if __name__ == "__main__":
             "languages": update_history(fresh_data["languages"], "hist_langs.csv")
         }
     else:
-        # Load existing history if not fetching
         try:
             stats = {
                 "views": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_views.csv")),
@@ -159,5 +156,4 @@ if __name__ == "__main__":
             print("No historical data found. Run with --fetch first.")
             exit()
 
-    # 3. Plot based on flags
     run_plots(stats, args)
