@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "github-static-stats"
+version = "0.1.0"
+description = "Simple automation to fetch repository-statistics from github, save them locally and plot them."
+authors = ["protogia <goldengrizz01@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pygithub = "^2.8.1"
+plotly = "^6.6.0"
+python-dotenv = "^1.2.2"
+rich-argparse = "^1.7.2"
+argcomplete = "^3.6.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
