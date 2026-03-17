@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import plotly.express as px
-from github import Github, GithubException
+from github import Github, GithubException, Auth
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from rich_argparse import RichHelpFormatter
@@ -34,7 +34,7 @@ def update_history(df_new, filename):
 
 def fetch_from_github(exclude=True):
     """Fetch fresh data from GitHub API."""
-    g = Github(repoconf.ACCESS_TOKEN)
+    g = Github(auth=Auth.Token(repoconf.ACCESS_TOKEN))
     user = g.get_user()
     
     views_list, clones_list, refs_list, repo_stats = [], [], [], []
@@ -148,7 +148,7 @@ if __name__ == "__main__":
             stats = {
                 "views": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_views.csv")),
                 "clones": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_clones.csv")),
-                "referrers": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_refs.csv")),
+                # "referrers": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_refs.csv")),
                 "general": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_general.csv")),
                 "languages": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_langs.csv"))
             }
