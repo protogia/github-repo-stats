@@ -120,7 +120,7 @@ def run_plots(data, args):
         fig_c = px.line(df_c, x="date", y="cum_clones", color="repo", title="Cumulative Clones", template="plotly_dark")
         save_plotly_json(fig_c, "clones")
 
-    if args.referrering and not data["referrers"].empty:
+    if args.referrers and not data["referrers"].empty:
         ref_sum = data["referrers"].groupby("site")["views"].sum().sort_values(ascending=False).head(10).reset_index()
         fig_r = px.pie(ref_sum, values="views", names="site", title="Top Traffic Sources", template="plotly_dark")
         save_plotly_json(fig_r, "referrers")
