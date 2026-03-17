@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Simple automation to fetch repository-statistics from github, save them locally and plot them."
 authors = ["protogia <goldengrizz01@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
