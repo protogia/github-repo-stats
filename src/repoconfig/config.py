@@ -5,5 +5,5 @@ load_dotenv()
 
 ACCESS_TOKEN    = os.getenv("GITHUB_ACCESS_TOKEN")
 USER            = "protogia"
-HISTORY_FILE    = "traffic_history.csv"
+HISTORY_DIR    = "data/"
 PLOT_DIR        = "../static/plotly/home" # one dir down, because I use the script as submodule for my website

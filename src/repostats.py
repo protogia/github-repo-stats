@@ -17,7 +17,7 @@ def save_plotly_json(fig, name):
 
 def update_history(df_new, filename):
     """Merges new data with historical CSV to prevent 14-day data loss."""
-    path = os.path.join(os.path.dirname(repoconf.HISTORY_FILE), filename)
+    path = os.path.join(os.path.dirname(repoconf.HISTORY_DIR), filename)
     
     if os.path.exists(path) and not df_new.empty:
         df_old = pd.read_csv(path)
@@ -146,11 +146,11 @@ if __name__ == "__main__":
     else:
         try:
             stats = {
-                "views": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_views.csv")),
-                "clones": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_clones.csv")),
-                "referrers": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_refs.csv")),
-                "general": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_general.csv")),
-                "languages": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_FILE), "hist_langs.csv"))
+                "views": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_views.csv")),
+                "clones": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_clones.csv")),
+                "referrers": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_refs.csv")),
+                "general": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_general.csv")),
+                "languages": pd.read_csv(os.path.join(os.path.dirname(repoconf.HISTORY_DIR), "hist_langs.csv"))
             }
         except FileNotFoundError:
             print("No historical data found. Run with --fetch first.")
