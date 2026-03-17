@@ -18,7 +18,3 @@ cp .env.template .env
 poetry run python src/repostats.py --help
 ```
 
-# usage in other repos
-```bash
-# todo
-```
