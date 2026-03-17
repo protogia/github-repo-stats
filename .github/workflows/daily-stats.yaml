@@ -30,7 +30,7 @@ jobs:
 
       - name: Run Stats Script
         env:
-          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           poetry run python src/repostats.py --fetch --views --clones --referrering
 
