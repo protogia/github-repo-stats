@@ -33,7 +33,7 @@ jobs:
           USERNAME:  ${{ github.repository_owner }}
           PARENT_REPO_NAME:  ${{ vars.parent_repository }}
         run: |
-          poetry run python src/repostats.py --fetch --views --clones --referrers
+          poetry run python src/repostats.py -m -c -g -l -v -r -F 
 
       - name: Commit and Push changes
         run: |
