@@ -5,7 +5,7 @@ Simple automation to fetch repository-statistics from github, save them locally 
 You need a fine grained access token for github.
 Go to settings -> developer settings -> secrets -> fine-grained-token.
 
-I needs this permissions:
+It needs this permissions:
 - administration: read-only
 - content: read-only
 - issues: read-only
