@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Repository Analytics</title>
+
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    max-width: 1200px;
+}
+.plot-container {
+    margin-bottom: 60px;
+}
+.plot {
+    width: 100%;
+    height: 600px;
+}
+</style>
+</head>
+<body>
+
+<h1>Repository Analytics Dashboard</h1>
+<div id="plots"></div>
+
+<script>
+// content
+const files = [
+  "clones.json",
+  "commit_distribution.json",
+  "engagement_scatter.json",
+  "issue_pr_distribution.json",
+  "labels_treemap.json",
+  "views.json"
+];
+
+// base64 -> numeric array
+function decodeBdata(obj) {
+  if (!obj || !obj.bdata) return obj;
+
+  const binary = atob(obj.bdata);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  // dtype handling (i1 = int8)
+  switch (obj.dtype) {
+    case "i1": return Array.from(new Int8Array(bytes.buffer));
+    case "i2": return Array.from(new Int16Array(bytes.buffer));
+    case "i4": return Array.from(new Int32Array(bytes.buffer));
+    case "f4": return Array.from(new Float32Array(bytes.buffer));
+    case "f8": return Array.from(new Float64Array(bytes.buffer));
+    default: return obj;
+  }
+}
+
+// for sec
+function safeDecode(obj) {
+  if (!obj || !obj.bdata) return obj;
+
+  // limit size (~5MB)
+  if (obj.bdata.length > 5_000_000) {
+    console.warn("Skipping large dataset");
+    return [];
+  }
+
+  const allowed = ["i1", "i2", "i4", "f4", "f8"];
+  if (!allowed.includes(obj.dtype)) {
+    console.warn("Unknown dtype:", obj.dtype);
+    return [];
+  }
+
+  return decodeBdata(obj);
+}
+
+// recursively fix traces
+function normalizeFigure(fig) {
+  const data = fig.data || fig.figure?.data;
+  const layout = fig.layout || fig.figure?.layout || {};
+
+  data.forEach(trace => {
+    if (trace.y) trace.y = safeDecode(trace.y);
+    if (trace.x) trace.x = safeDecode(trace.x);
+    if (trace.z) trace.z = safeDecode(trace.z);
+  });
+
+  return { data, layout };
+}
+
+const container = document.getElementById("plots");
+
+files.forEach((file, i) => {
+  const wrapper = document.createElement("div");
+  wrapper.className = "plot-container";
+
+  const title = document.createElement("h2");
+  title.textContent = file;
+
+  const plotDiv = document.createElement("div");
+  plotDiv.id = "plot-" + i;
+  plotDiv.className = "plot";
+
+  wrapper.appendChild(title);
+  wrapper.appendChild(plotDiv);
+  container.appendChild(wrapper);
+
+  fetch("plots/" + file)
+    .then(res => res.json())
+    .then(fig => {
+      const normalized = normalizeFigure(fig);
+
+      Plotly.newPlot(
+        plotDiv,
+        normalized.data,
+        normalized.layout,
+        { responsive: true }
+      );
+    })
+    .catch(err => {
+      plotDiv.innerHTML = "<p style='color:red'>Failed to load " + file + "</p>";
+      console.error(err);
+    });
+});
+</script>
+
+</body>
+</html>
