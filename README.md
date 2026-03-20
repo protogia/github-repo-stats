@@ -27,5 +27,8 @@ cp .env.template .env
 ```bash
 poetry run python src/repostats.py --help 
 
-poetry run python src/repostats.py -c -v -g -r -F # fetch all data from github, update hist_*.csv-files, plot data via plotly and save as .json
+poetry run python src/repostats.py -c -v -g -r -l -F # fetch all data from github, update hist_*.csv-files, plot data via plotly and save as .json
 ```
+
+## view statistics
+Run a webserver and check the index.html. Its a static collection of all plots.  
