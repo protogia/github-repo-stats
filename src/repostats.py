@@ -161,34 +161,6 @@ def plot_issue_labels_treemap(df):
     return fig
 
 
-def plot_issue_pr_distribution(df):
-    """Stacked bar chart comparing issue and PR status"""
-    if df.empty or not {'repo', 'open_issues', 'open_prs', 'closed_prs'}.issubset(df.columns):
-        return None
-    
-    df_plot = df[['repo', 'open_issues', 'open_prs', 'closed_prs']].copy()
-    df_plot = df_plot.sort_values('open_issues', ascending=False)
-    
-    fig = go.Figure(
-        data=[
-            go.Bar(name='Open Issues', x=df_plot['repo'], y=df_plot['open_issues'], marker_color='#EF553B'),
-            go.Bar(name='Open PRs', x=df_plot['repo'], y=df_plot['open_prs'], marker_color='#00CC96'),
-            go.Bar(name='Closed PRs', x=df_plot['repo'], y=df_plot['closed_prs'], marker_color='#636EFA'),
-        ]
-    )
-    
-    fig.update_layout(
-        barmode='stack',
-        title="Issues & Pull Requests by Repository",
-        xaxis_title="Repository",
-        yaxis_title="Count",
-        hovermode='x unified',
-        height=500
-    )
-    
-    return fig
-
-
 def run_plots(data, args):
     if args.commits and not data["commits"].empty:
         df = data["commits"].copy()
@@ -196,29 +168,44 @@ def run_plots(data, args):
             df["date"] = pd.to_datetime(df["date"]).dt.date
             df_grouped = df.groupby(["date", "repo"])["commits"].sum().reset_index()
 
-            totals = df_grouped.groupby("date")["commits"].sum().reset_index().rename(columns={"commits": "total_commits"})
-            df_merged = df_grouped.merge(totals, on="date")
+            plot_mode = repoconf.COMMIT_DISTRIBUTION_PLOT_MODE
 
-            fig = px.area(
-                df_merged,
-                x="date",
-                y="commits",
-                color="repo",
-                groupnorm='percent',
-                title="Commit Distribution (Relative %)"
-            )
+            if plot_mode == "bar":
+                fig = px.bar(
+                    df_grouped,
+                    x="date",
+                    y="commits",
+                    color="repo",
+                    title="Daily Commit Count by Repository",
+                    barmode="stack"
+                )
+                hover_suffix = "Commits: %{y}"
+            else:
+                fig = px.area(
+                    df_grouped,
+                    x="date",
+                    y="commits",
+                    color="repo",
+                    groupnorm='percent',
+                    title="Commit Distribution (Relative %)"
+                )
+                hover_suffix = "Share: %{y:.2f}%"
 
             fig.update_traces(
                 hovertemplate=(
                     "Repo: %{fullData.name}<br>"
-                    "Date: %{x}<br>"
-                    "Share: %{y:.2f}%<extra></extra>"
-                ),
-                customdata=df_merged[["commits"]].values
+                    "Date: %{x}<br>" + 
+                    hover_suffix + "<extra></extra>"
+                )
             )
 
-            fig.update_layout(xaxis=dict(rangeslider=dict(visible=True), type="date"))
+            fig.update_layout(
+                xaxis=dict(rangeslider=dict(visible=True), type="date"),
+                yaxis_title="Total Commits" if plot_mode == "bar" else "Percent of Total"
+            )
+            
             save_plotly_json(fig, "commit_distribution")
+    
 
     if args.views and not data.get("views", pd.DataFrame()).empty:
         df = data["views"]
@@ -240,17 +227,6 @@ def run_plots(data, args):
             ref_sum = df.groupby("site")["views"].sum().sort_values(ascending=False).head(10).reset_index()
             fig_r = px.pie(ref_sum, values="views", names="site", title="Top Traffic Sources")
             save_plotly_json(fig_r, "referrers")
-
-    # if args.general and not data.get("general", pd.DataFrame()).empty:
-    #     df = data["general"]
-    #     if {'repo', 'open_issues', 'stars'}.issubset(df.columns):
-    #         fig_ip = plot_issue_pr_distribution(df)
-    #         if fig_ip:
-    #             save_plotly_json(fig_ip, "issue_pr_distribution")
-
-    #         fig_sc = plot_engagement_scatter(df)
-    #         if fig_sc:
-    #             save_plotly_json(fig_sc, "engagement_scatter")
 
     if args.labels and not data.get("labels", pd.DataFrame()).empty:
         fig_tr = plot_issue_labels_treemap(data["labels"])

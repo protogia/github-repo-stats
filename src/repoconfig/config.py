@@ -7,3 +7,6 @@ ACCESS_TOKEN    = os.getenv("GITHUB_ACCESS_TOKEN")
 USER            = "protogia"
 HISTORY_DIR    = "data/"
 PLOT_DIR        = "plots/" 
+
+# PLOTTING #######################################
+COMMIT_DISTRIBUTION_PLOT_MODE = "bar" # /area
