@@ -189,34 +189,6 @@ def plot_issue_pr_distribution(df):
     return fig
 
 
-def plot_engagement_scatter(df):
-    """Scatter plot: stars vs recent activity with size encoding"""
-    if df.empty or not {'repo', 'stars', 'recent_activity', 'open_issues'}.issubset(df.columns):
-        return None
-    
-    fig = px.scatter(
-        df,
-        x='stars',
-        y='recent_activity',
-        size='open_issues',
-        color='open_issues',
-        hover_name='repo',
-        title="Repository Engagement: Stars vs Activity",
-        labels={
-            'stars': 'GitHub Stars',
-            'recent_activity': 'Commits',
-            'open_issues': 'Open Issues'
-        },
-        color_continuous_scale='Viridis'
-    )
-    
-    fig.update_traces(
-        hovertemplate='<b>%{hovertext}</b><br>Stars: %{x}<br>Activity: %{y}<br>Issues: %{marker.size}<extra></extra>'
-    )
-    
-    return fig
-
-
 def run_plots(data, args):
     if args.commits and not data["commits"].empty:
         df = data["commits"].copy()
@@ -240,7 +212,6 @@ def run_plots(data, args):
                 hovertemplate=(
                     "Repo: %{fullData.name}<br>"
                     "Date: %{x}<br>"
-                    "Commits: %{customdata[0]}<br>"
                     "Share: %{y:.2f}%<extra></extra>"
                 ),
                 customdata=df_merged[["commits"]].values
@@ -270,16 +241,16 @@ def run_plots(data, args):
             fig_r = px.pie(ref_sum, values="views", names="site", title="Top Traffic Sources")
             save_plotly_json(fig_r, "referrers")
 
-    if args.general and not data.get("general", pd.DataFrame()).empty:
-        df = data["general"]
-        if {'repo', 'open_issues', 'stars'}.issubset(df.columns):
-            fig_ip = plot_issue_pr_distribution(df)
-            if fig_ip:
-                save_plotly_json(fig_ip, "issue_pr_distribution")
+    # if args.general and not data.get("general", pd.DataFrame()).empty:
+    #     df = data["general"]
+    #     if {'repo', 'open_issues', 'stars'}.issubset(df.columns):
+    #         fig_ip = plot_issue_pr_distribution(df)
+    #         if fig_ip:
+    #             save_plotly_json(fig_ip, "issue_pr_distribution")
 
-            fig_sc = plot_engagement_scatter(df)
-            if fig_sc:
-                save_plotly_json(fig_sc, "engagement_scatter")
+    #         fig_sc = plot_engagement_scatter(df)
+    #         if fig_sc:
+    #             save_plotly_json(fig_sc, "engagement_scatter")
 
     if args.labels and not data.get("labels", pd.DataFrame()).empty:
         fig_tr = plot_issue_labels_treemap(data["labels"])
